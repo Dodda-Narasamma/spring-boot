@@ -1,0 +1,8 @@
+package org.jsp.springbootmockuser.dto;
+
+public class ResponseStructure<T> {
+	private String messsage;
+	private T data;
+	private int statusCode;
+
+}

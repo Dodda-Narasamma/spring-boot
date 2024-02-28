@@ -1,0 +1,72 @@
+package org.jsp.springbootmockuser.service;
+
+import java.util.Optional;
+
+
+import org.jsp.springbootmockuser.dao.AddressDao;
+import org.jsp.springbootmockuser.dao.UserDao;
+import org.jsp.springbootmockuser.dto.Address;
+import org.jsp.springbootmockuser.dto.ResponseStructure;
+import org.jsp.springbootmockuser.dto.User;
+import org.jsp.springbootmockuser.exception.IdNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AddressService {
+	@Autowired
+	private UserDao userDao;
+	@Autowired
+	private AddressDao addressDao;
+	
+	
+	public ResponseEntity<ResponseStructure<Address>> saveAddress(Address address,int userid){
+		ResponseStructure<Address> structure=new ResponseStructure<>();
+		Optional<User> recUser=userDao.findById(userid);
+		if(recUser.isPresent()) {
+			User u=recUser.get();
+			u.getAddresses().add(address);
+			userDao.saveUser(u);
+			address.setUsers(u);
+			structure.setData(addressDao.saveAddress(address));
+			structure.setMesssage("Adrress saved");
+			structure.setStatusCode(HttpStatus.CREATED.value());
+			return new ResponseEntity<ResponseStructure<Address>>(structure,HttpStatus.CREATED);
+		}
+		throw new IdNotFoundException();
+	} 
+	public ResponseEntity<ResponseStructure<Address>> updateAddress(Address address){
+		ResponseStructure<Address> structure=new ResponseStructure<>();
+		Optional<Address> recUser=addressDao.findById(address.getId());
+		if(recUser.isPresent()) {
+			Address add=recUser.get();
+			add.setBuild_name(address.getBuild_name());
+			add.setLandmark(address.getLandmark());
+			add.setArea(address.getArea());
+			add.setCity(address.getCity());
+			add.setCountry(address.getCountry());
+			add.setState(address.getState());
+			add.setPincode(address.getPincode());
+			add.setType(address.getType());
+			structure.setData(addressDao.updateAddress(add));
+			structure.setMesssage("Adrress updated");
+			structure.setStatusCode(HttpStatus.ACCEPTED.value());
+			return new ResponseEntity<ResponseStructure<Address>>(structure,HttpStatus.ACCEPTED);
+		}
+		throw new IdNotFoundException();
+	} 
+	public ResponseEntity<ResponseStructure<Address>> findById(int id){
+		ResponseStructure< Address> structure=new ResponseStructure<>();
+		Optional< Address> recAdd=addressDao.findById(id);
+		if(recAdd.isPresent()) {
+			structure.setData(recAdd.get());
+			structure.setMesssage("Adreess upadted");
+			structure.setStatusCode(HttpStatus.OK.value());
+			return new ResponseEntity<ResponseStructure<Address>>(structure,HttpStatus.ACCEPTED);
+			
+		}
+		throw new IdNotFoundException();
+	}
+}

@@ -1,0 +1,5 @@
+package org.jsp.springbootmockuser.exception;
+
+public class IdNotFoundException {
+
+}
